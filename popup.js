@@ -54,9 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   });
   
-  
+
+
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    document.getElementById('result').innerHTML = 'generating captions backend...';
+    document.getElementById('result').innerHTML = 'generating captions ,refresh later...';
     chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
       var currentTabUrl = tabs[0].url;
       var apiUrl = global_url+'searchvtt?youtube_url=' + encodeURIComponent(currentTabUrl);
