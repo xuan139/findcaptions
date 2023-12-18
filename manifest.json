@@ -5,11 +5,11 @@
     "description": "Find Youtube Captions while watching ",
     "permissions": ["activeTab"],
     "action": {
-      "default_icon": "hello_extensions.png",
+      "default_icon": "ext.png",
       "default_popup": "popup.html"
     },
     "icons": {
-      "48": "hello_extensions.png"
+      "48": "ext.png"
     },
     "background": {
       "service_worker": "background.js"

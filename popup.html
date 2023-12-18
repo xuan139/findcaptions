@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      width: 400px;
+      width: 300px;
     }
 
     #main {
@@ -13,18 +13,21 @@
     }
 
     #result {
-      width: 100%; /* Set the width of #main */
-      color: blue; /* Set the font color to blue */
+      width: 100%; /* Set the width of #result */
+      color: black; /* Set the font color to blue */
+      font-size: 14px; /* Set the font size to 16 pixels (adjust as needed) */
     }
   </style>
   <script src="popup.js"></script>
-  <title>Your Webpage</title>
+  <title>Captions</title>
 </head>
 <body>
   <div id="main">
+
+    <img id="myImage" alt="Image Caption">
+    <div id="downloadVtt"></div>
     <div id="result"></div>
     <p></p>
-    <button id="getDataBtn">Transcript</button>
   </div>
 </body>
 </html>
