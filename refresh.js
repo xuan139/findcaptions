@@ -3,10 +3,22 @@ var global_url = 'http://192.168.0.171:5000/';
 
 var globalCaptionUrls = [];
 
+
+
+function applyButtonStyles(button) {
+    button.style.padding = '10px 15px'; // Adjust padding as needed
+    button.style.backgroundColor = '#3498db'; // Set background color
+    button.style.color = '#ffffff'; // Set text color
+    button.style.border = 'none'; // Remove border
+    button.style.borderRadius = '5px'; // Add rounded corners
+    button.style.width = '80px'; // Adjust width
+    button.style.height = '30px'; // Adjust height
+  }
+
 function downloadcaptions() {
     chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
         try {
-            document.getElementById('result').textContent = 'waiting for download captions... or come back later ';
+            document.getElementById('result').textContent = 'waitting for download captions... or come back later ';
 
             var currentTabUrl = tabs[0].url;
             var apiUrl = global_url + 'downloadaudio?youtube_url=' + encodeURIComponent(currentTabUrl);
@@ -34,10 +46,6 @@ function downloadcaptions() {
                     // Save each URL in the global array
                     const captionUrl = global_url + item;
                     globalCaptionUrls.push(captionUrl);
-
-                    // paragraph.textContent = captionUrl;
-                    // downloadVttDiv.appendChild(paragraph);
-                    // captionDiv.appendChild(paragraph)
                 });
     
                 document.getElementById('result').textContent = `Found ${data.length} caption(s)`;
@@ -65,29 +73,33 @@ function downloadcaptions() {
                             downloadLink.href = url;
                             downloadLink.download = url; // You can customize the file name
                             // Create a button element
-                            const button = document.createElement('button');
-                            button.textContent = 'Play';
-                            button.addEventListener('click', () => {
-                                // Do something when the button is clicked, for example, alert the URL
-                                var myVideo = document.getElementById('myVideo');
-                                myVideo.controls = true;
-                                myVideo.src = data;
-                
-                                var track = document.createElement('track');
-                                track.kind = 'subtitles';
-                                track.srclang = 'en';
-                                track.src = url;
-                                myVideo.appendChild(track);
-                                track.default = true;
 
-                                myVideo.play();
-                            });
+                            var myVideo = document.getElementById('myVideo');
+                            var track = document.createElement('track');
+                            myVideo.controls = true;
+                            myVideo.src = data;          
+                            track.kind = 'subtitles';
+
+                            const match = url.match(/\.([^.]+)\.[^.]+$/);
+                            // Check if the match is found and get the captured group
+                            const languageCode = match ? match[1] : null;
+                            track.srclang = languageCode;
+                            track.src = url;
+                                
+                            myVideo.appendChild(track);
+                            track.default = true;
+
+                            // const playbutton = document.createElement('button');
+                            // applyButtonStyles(playbutton)
+                            // playbutton.textContent = 'Play';
+                            // playbutton.addEventListener('click', () => {
+                            //     // Do something when the button is clicked, for example, alert the URL
+                            //     myVideo.play();
+                            // });
                         
-
-
                             captionDiv.appendChild(paragraph);
                             captionDiv.appendChild(downloadLink);
-                            captionDiv.appendChild(button);
+                            // captionDiv.appendChild(playbutton);
                             
                         });
         
