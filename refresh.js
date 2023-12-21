@@ -66,10 +66,15 @@ function downloadcaptions() {
                         globalCaptionUrls.forEach((url, index) => {
                             // Create a paragraph element to contain the URL
                             const paragraph = document.createElement('p');
-                            paragraph.textContent = `${url}`;
-                                                    // Create an anchor element for the download link
+                            // paragraph.textContent = `${url}`;
+                            // Create an anchor element for the download link
+
+                            
+                            const match = url.match(/\.([^.]+)\.[^.]+$/);
+                            // Check if the match is found and get the captured group
+                            const languageCode = match ? match[1] : null;
                             var downloadLink = document.createElement('a');
-                            downloadLink.textContent = 'Download VTT';
+                            downloadLink.textContent = 'Download VTT:'+ languageCode ;
                             downloadLink.href = url;
                             downloadLink.download = url; // You can customize the file name
                             // Create a button element
@@ -80,9 +85,9 @@ function downloadcaptions() {
                             myVideo.src = data;          
                             track.kind = 'subtitles';
 
-                            const match = url.match(/\.([^.]+)\.[^.]+$/);
-                            // Check if the match is found and get the captured group
-                            const languageCode = match ? match[1] : null;
+                            // const match = url.match(/\.([^.]+)\.[^.]+$/);
+                            // // Check if the match is found and get the captured group
+                            // const languageCode = match ? match[1] : null;
                             track.srclang = languageCode;
                             track.src = url;
                                 
