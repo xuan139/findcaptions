@@ -3,8 +3,6 @@ var global_url = 'http://192.168.0.171:5000/';
 
 var globalCaptionUrls = [];
 
-
-
 function applyButtonStyles(button) {
     button.style.padding = '10px 15px'; // Adjust padding as needed
     button.style.backgroundColor = '#3498db'; // Set background color
@@ -31,10 +29,8 @@ function downloadcaptions() {
                 return response.json();
             })
             .then(data => {
-                // Process the data (assuming it's an array)
-                console.log("VTT Files:", data);
-    
-                // Your logic to handle the data, e.g., updating UI
+
+                document.getElementById('result').textContent = data;
 
                 const downloadVttDiv = document.getElementById('downloadVtt');
                 const captionDiv = document.getElementById('caption');
@@ -42,15 +38,11 @@ function downloadcaptions() {
                 downloadVttDiv.innerHTML = '';
                 captionDiv.innerHTML = '';
                 data.forEach(item => {
-                    // const paragraph = document.createElement('p');
-                    // Save each URL in the global array
                     const captionUrl = global_url + item;
                     globalCaptionUrls.push(captionUrl);
                 });
     
                 document.getElementById('result').textContent = `Found ${data.length} caption(s)`;
-                
-
                 var apiUrl = global_url + 'get_video_info?youtube_url=' + encodeURIComponent(currentTabUrl);
 
                 fetch(apiUrl)
@@ -61,15 +53,13 @@ function downloadcaptions() {
                         return response.json();
                     })
                     .then(data => {
+                        
                         // document.getElementById('result').textContent = data;
 
                         globalCaptionUrls.forEach((url, index) => {
                             // Create a paragraph element to contain the URL
                             const paragraph = document.createElement('p');
-                            // paragraph.textContent = `${url}`;
-                            // Create an anchor element for the download link
-
-                            
+      
                             const match = url.match(/\.([^.]+)\.[^.]+$/);
                             // Check if the match is found and get the captured group
                             const languageCode = match ? match[1] : null;
@@ -85,30 +75,16 @@ function downloadcaptions() {
                             myVideo.src = data;          
                             track.kind = 'subtitles';
 
-                            // const match = url.match(/\.([^.]+)\.[^.]+$/);
-                            // // Check if the match is found and get the captured group
-                            // const languageCode = match ? match[1] : null;
                             track.srclang = languageCode;
                             track.src = url;
                                 
                             myVideo.appendChild(track);
                             track.default = true;
-
-                            // const playbutton = document.createElement('button');
-                            // applyButtonStyles(playbutton)
-                            // playbutton.textContent = 'Play';
-                            // playbutton.addEventListener('click', () => {
-                            //     // Do something when the button is clicked, for example, alert the URL
-                            //     myVideo.play();
-                            // });
                         
                             captionDiv.appendChild(paragraph);
                             captionDiv.appendChild(downloadLink);
-                            // captionDiv.appendChild(playbutton);
                             
                         });
-        
-
                     })
                     .catch(error => {
                         console.error('get_video_info fail, try later:', error);
@@ -118,6 +94,8 @@ function downloadcaptions() {
             })
             .catch(error => {
                 console.error('Error fetching VTT files:', error);
+                document.getElementById('result').textContent = 'not valid';
+
             });
         } catch (error) {
             document.getElementById('result').textContent = 'downloadaudio fail, try later';
