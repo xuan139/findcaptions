@@ -1,17 +1,8 @@
 var global_caption_url = '';
-var global_url = 'http://192.168.0.171:5000/';
-
+var global_url = 'http://127.0.0.1:5000/';
+// var global_url = 'https://excited-needlessly-gopher.ngrok-free.app/';
 var globalCaptionUrls = [];
 
-function applyButtonStyles(button) {
-    button.style.padding = '10px 15px'; // Adjust padding as needed
-    button.style.backgroundColor = '#3498db'; // Set background color
-    button.style.color = '#ffffff'; // Set text color
-    button.style.border = 'none'; // Remove border
-    button.style.borderRadius = '5px'; // Add rounded corners
-    button.style.width = '80px'; // Adjust width
-    button.style.height = '30px'; // Adjust height
-  }
 
 function downloadcaptions() {
     chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
@@ -30,7 +21,7 @@ function downloadcaptions() {
             })
             .then(data => {
 
-                document.getElementById('result').textContent = data;
+                // document.getElementById('result').textContent = data;
 
                 const downloadVttDiv = document.getElementById('downloadVtt');
                 const captionDiv = document.getElementById('caption');
@@ -69,11 +60,56 @@ function downloadcaptions() {
                             downloadLink.download = url; // You can customize the file name
                             // Create a button element
 
-                            var myVideo = document.getElementById('myVideo');
+                            var videoElement = document.getElementById('myVideo');
                             var track = document.createElement('track');
-                            myVideo.controls = true;
-                            myVideo.src = data;          
+                            videoElement.controls = true;
+                            videoElement.src = data;          
                             track.kind = 'subtitles';
+
+
+                            // videoElement.src = data;
+                            videoSrc = videoElement.src;
+                            var videoUrl = encodeURIComponent(currentTabUrl)
+                            // var videoUrlHash = CryptoJS.SHA256(videoUrl).toString();
+        
+                            // 添加时间更新的监听器
+                            videoElement.addEventListener('timeupdate', function() {
+                                // Ensure CryptoJS is available before using it
+                                // if (typeof CryptoJS !== 'undefined' && CryptoJS.SHA256) {
+                                    // var videoUrlHash = CryptoJS.SHA256(videoUrl).toString();
+                                    var currentTime = videoElement.currentTime;
+        
+                                    // 先删除先前的数据
+                                    chrome.storage.local.remove(videoUrl, function() {
+                                        // 在回调函数中保存新的数据
+                                        var data = {};
+                                        data[videoUrl] = currentTime;
+                                        console.log(videoUrl, currentTime);
+                                        chrome.storage.local.set(data);
+                                    });
+                                // } else {
+                                //     console.error('CryptoJS is not available.');
+                                // }
+                            });
+                            videoElement.addEventListener('loadedmetadata', function() {
+                                // 获取视频的持续时间
+                                console.log('load video')
+                                console.log('videoUrl', videoUrl)
+                                
+                                chrome.storage.local.get(videoUrl, function(storageData) {
+                                    // Use storageData instead of data
+                                    var savedTime = storageData[videoUrl];
+                                    console.log('videoUrl', videoUrl)
+                                    var duration = videoElement.duration;
+                                    console.log('savedTime 1st', savedTime);
+                                    
+                                    // Check if savedTime is within the valid range
+                                    if (savedTime !== undefined && savedTime <= duration) {
+                                        // 如果保存的时间存在，设置视频的当前时间
+                                        videoElement.currentTime = savedTime;
+                                    }
+                                });
+                            });
 
                             track.srclang = languageCode;
                             track.src = url;
@@ -103,53 +139,6 @@ function downloadcaptions() {
         }
     });
 }
-
-
-// function fetchVttFiles() {
-
-// }
-
-
-// function getVideoFiles() {
-//     return new Promise((resolve, reject) => {
-//         chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
-//             try {
-//                 document.getElementById('result').textContent = 'captions downloaded';
-//                 var currentTabUrl = tabs[0].url;
-//                 var regExp = /^.*(?:youtu.be\/|youtube.com\/(?:embed\/|v\/|.*v=|.*\/videos\/|.*[?&]v=))([^"&?\/\s]{11}).*$/;
-//                 var match = currentTabUrl.match(regExp);
-//                 var videoId = (match && match[1]) ? match[1] : null;
-
-//                 var apiUrl = global_url + `/get_files/${videoId}`;
-//                 const response = await fetch(apiUrl);
-
-//                 if (!response.ok) {
-//                     throw new Error(`HTTP error! Status: ${response.status}`);
-//                 }
-
-//                 const data = await response.json();
-//                 var baseUrl = global_url;
-//                 var vttFiles = data.vtt_files.map(file => baseUrl + file);
-
-//                 var downloadLinks = document.getElementById('downloadVtt');
-//                 vttFiles.forEach((vttFile, index) => {
-//                     var link = document.createElement('a');
-//                     link.href = vttFile;
-//                     link.download = `caption${index + 1}.vtt`;
-//                     link.textContent = `Download VTT ${index + 1}`;
-//                     downloadLinks.appendChild(link);
-//                     downloadLinks.appendChild(document.createElement('br'));
-//                 });
-
-//                 resolve(); // Resolve the promise to signal completion
-//             } catch (error) {
-//                 console.error("get_file:", error);
-//                 document.getElementById('result').textContent = 'Caption not ready, come back later';
-//                 reject(error); // Reject the promise in case of an error
-//             }
-//         });
-//     });
-// }
 
 function getVideoInformation() {
     chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -182,6 +171,8 @@ function getVideoInformation() {
 
                 myVideo.appendChild(track);
                 track.default = true;
+
+                
             })
             .catch(error => {
                 console.error('get_video_info fail, try later:', error);

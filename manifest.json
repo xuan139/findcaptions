@@ -3,7 +3,7 @@
     "name": "Find Youtube Captions",
     "version": "1.0",
     "description": "Find Youtube Captions",
-    "permissions": ["activeTab"],
+    "permissions": ["activeTab","storage"], 
     "action": {
       "default_icon": "ext.png",
       "default_popup": "popup.html"
